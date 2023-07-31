@@ -52,6 +52,6 @@ class CommentAdmin(admin.ModelAdmin):
 # =====================================<< Ticket Admin >>=====================================
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'subject', 'seen']
+    list_display = ['id', 'name', 'email', 'subject', 'seen']
     list_display_links = ['id', 'name']
     # list_editable = ['seen']

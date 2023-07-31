@@ -54,7 +54,6 @@ def ticket(request):
             Ticket.objects.create(
                 name=cd['name'],
                 email=cd['email'],
-                phone=cd['phone'],
                 subject=cd['subject'],
                 message=cd['message']
             )
