@@ -4,6 +4,7 @@ from django_jalali.db import models as jmodels
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django_resized import ResizedImageField
 
 # Create your models here.
 
@@ -12,47 +13,11 @@ from django.urls import reverse
 class Brand(models.Model):
 
     # ---------------------------------------
-    class Name(models.TextChoices):
-        #JAPAN
-        SEIKO = 'سیکو', 'سیکو'
-        ORIENT = 'ارینت', 'ارینت'
-        CITIZEN = 'سیتیزن', 'سیتیزن'
-        CASIO = 'کاسیو', 'کاسیو'
-        G_SHOCK = 'جی شاک', 'جی شاک'
-        # SWISS
-        ROLEX = 'رولکس', 'رولکس'
-        PATEK_PHILIPPE = 'پتک فیلیپ', 'پتک فیلیپ'
-        OMEGA = 'امگا', 'امگا'
-        TAG_HEUER = 'تگ هویر', 'تگ هویر'
-        ROMANSON = 'رومانسون', 'رومانسون'
-        FREDERIQUE_CONSTANT = 'فردریک کنستانت', 'فردریک کنستانت'
-        # AMERICA
-        FOSSIL = 'فسیل', 'فسیل'
-        KENNETH_COLE = 'کنت کول', 'کنت کول'
-        # GERMANY
-        ESCADA = 'اسکادا', 'اسکادا'
-        DUFA = 'دوفا', 'دوفا'
-        # DANMARK
-        SKAGEN = 'اسکاگن', 'اسکاگن'
-        BESTDON = 'بستدان', 'بستدان'
-
-    class Nationality(models.TextChoices):
-        CHINA = 'CHINA', 'چین'
-        SWITZERLAND = 'SWITZERLAND', 'سوئیس'
-        JAPAN = 'JAPAN', 'ژاپن'
-        AMERICA = 'AMERICA', 'آمریکا'
-        DENMARK = 'DENMARK', 'دانمارک'
-        ENGLAND = 'ENGLAND', 'انگلیس'
-        ITALY = 'ITALY', 'ایتالیا'
-        GERMANY = 'GERMANY', 'آلمان'
-        AUSTRIA = 'AUSTRIA', 'اتریش'
-        AUSTRALIA = 'AUSTRALIA', 'استرالیا'
-        OTHER = 'OTHER', 'دیگر'
-
-    # ---------------------------------------
     name = models.CharField(max_length=100, verbose_name='برند')
     persian_name = models.CharField(max_length=100, verbose_name='نام فارسی برند')
     nationality = models.CharField(max_length=50, verbose_name='ملیت')
+
+    image_file = ResizedImageField(upload_to="brand_images/")
 
     # ---------------------------------------
     objects = jmodels.jManager()
@@ -245,8 +210,32 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     # ---------------------------------------
+    def get_absolute_url(self):
+        return reverse('product:product_detail', args=[self.id])
+    
+    # ---------------------------------------
     def __str__(self):
         return f" ساعت مچی برند{self.brand} مدل {self.model} "
+
+
+# =======================================<< Image >>=======================================
+class Image(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
+    image_file = ResizedImageField(upload_to="product_images/", quality=80)
+    title = models.CharField(null=True, blank=True, max_length=250, verbose_name='عنوان')
+    description = models.TextField(null=True, blank=True, verbose_name='توضیحات')
+    create = jmodels.jDateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-create']
+        indexes = [
+            models.Index(fields=['-create'])
+        ]
+        verbose_name = "تصویر"
+        verbose_name_plural = "تصویرها"
+
+    def __str__(self):
+        return self.title if self.title else "None"
 
 
 # =======================================<< Ticket >>=======================================

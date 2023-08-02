@@ -4,12 +4,23 @@ from django_jalali.admin.filters import JDateFieldListFilter
 import django_jalali.admin as jadmin
 
 
+# =======================================<< InlineAdmin Classes >>=======================================
+class ImageInline(admin.TabularInline):
+    model = Image
+    extra = 0
+
+
+class CommentInline(admin.TabularInline):
+    model = Comment
+    extra = 0
+
+
 # =======================================<< Brand Admin >>=======================================
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'persian_name', 'nationality']
-    ordering = ['nationality', 'name']
-    list_display_links = ['id']
+    ordering = ['name']
+    list_display_links = ['id', 'name']
     search_fields = ['name', 'nationality']
     # list_editable = ['name', 'nationality']
     list_filter = ['nationality']
@@ -20,9 +31,9 @@ class BrandAdmin(admin.ModelAdmin):
 class ColorAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'value']
     ordering = ['name']
-    list_display_links = ['id']
+    list_display_links = ['id', 'name']
     search_fields = ['name', 'value']
-    list_editable = ['name', 'value']
+    list_editable = ['value']
 
 
 # =======================================<< Product Admin >>=======================================
@@ -37,6 +48,7 @@ class ProductAdmin(admin.ModelAdmin):
     date_hierarchy = 'publish'
     prepopulated_fields = {'slug': ['brand', 'model']}
     search_fields = ['brand', 'model']
+    inlines = [ImageInline, CommentInline]
 
 
 # =======================================<< Comment Admin >>=======================================
